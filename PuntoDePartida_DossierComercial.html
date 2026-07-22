@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Punto de Partida — Sumá tu marca</title>
+<style>
+  :root{
+    --navy:#1F3864;
+    --navy-light:#2E5395;
+    --red:#C00000;
+    --gray:#595959;
+    --light:#DCE6F1;
+    --gold:#D4A017;
+    --border:#D9D9D9;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:Arial, Helvetica, sans-serif;
+    color:#222;
+    background:#f4f6f9;
+    line-height:1.6;
+  }
+  header.hero{
+    background:linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+    color:#fff;
+    padding:56px 24px 44px;
+    text-align:left;
+  }
+  header.hero .inner{max-width:1040px;margin:0 auto;}
+  header.hero h1{margin:0 0 8px;font-size:2.8rem;letter-spacing:1px;}
+  header.hero p.tagline{margin:0 0 20px;font-style:italic;font-size:1.2rem;color:#dfe7f5;}
+  header.hero p.pitch{margin:0 0 20px;font-size:1.05rem;max-width:640px;color:#f0f3fa;}
+  header.hero .meta{display:flex;flex-wrap:wrap;gap:10px;}
+  header.hero .meta span{
+    background:rgba(255,255,255,0.14);
+    border:1px solid rgba(255,255,255,0.32);
+    padding:7px 16px;
+    border-radius:20px;
+    font-size:0.85rem;
+  }
+  nav.tabs{
+    position:sticky;top:0;z-index:10;
+    background:#fff;
+    border-bottom:2px solid var(--border);
+    box-shadow:0 2px 6px rgba(0,0,0,0.06);
+  }
+  nav.tabs .inner{
+    max-width:1040px;margin:0 auto;
+    display:flex;gap:4px;flex-wrap:wrap;padding:0 24px;
+    align-items:center;
+  }
+  nav.tabs a{
+    display:block;padding:14px 16px;color:var(--navy);
+    text-decoration:none;font-weight:bold;font-size:0.9rem;
+    border-bottom:3px solid transparent;
+  }
+  nav.tabs a:hover{border-bottom:3px solid var(--red);background:#fafbfc;}
+  nav.tabs .cta{
+    margin-left:auto;background:var(--red);color:#fff !important;
+    border-radius:20px;padding:9px 18px !important;font-size:0.85rem;
+  }
+  main{max-width:1040px;margin:0 auto;padding:8px 24px 60px;}
+  section{
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:32px 36px;
+    margin-top:24px;
+    position:relative;
+  }
+  section h2{
+    color:var(--navy);
+    font-size:1.6rem;
+    margin-top:0;
+    padding-bottom:10px;
+    border-bottom:3px solid var(--red);
+  }
+  section h3{color:var(--navy-light);font-size:1.1rem;margin-bottom:8px;}
+  .grid-facts{
+    display:grid;grid-template-columns:200px 1fr;
+    border:1px solid var(--border); border-radius:6px; overflow:hidden;
+    margin:16px 0;
+  }
+  .grid-facts div{padding:10px 14px; border-bottom:1px solid var(--border);}
+  .grid-facts div:nth-child(4n+1), .grid-facts div:nth-child(4n+2){background:var(--light);}
+  .grid-facts .label{font-weight:bold;color:var(--navy);background:var(--light) !important;}
+  .grid-facts div:last-child, .grid-facts div:nth-last-child(2){border-bottom:none;}
+
+  .why-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:18px;}
+  .why-card{background:var(--light);border-radius:8px;padding:18px 20px;}
+  .why-card h4{margin:0 0 6px;color:var(--navy);font-size:1rem;}
+  .why-card p{margin:0;font-size:0.9rem;color:#333;}
+
+  .pkg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-top:20px;}
+  .pkg-card{
+    border:1px solid var(--border);border-radius:10px;padding:22px 20px;
+    display:flex;flex-direction:column;position:relative;background:#fff;
+  }
+  .pkg-card.premium{
+    background:linear-gradient(160deg, var(--navy) 0%, #14213d 100%);
+    color:#fff;border:2px solid var(--gold);
+  }
+  .pkg-card .tag{
+    display:inline-block;position:absolute;top:-12px;right:16px;background:var(--red);color:#fff;
+    font-size:0.7rem;font-weight:bold;padding:4px 10px;border-radius:10px;
+  }
+  .pkg-card.premium .tag{background:var(--gold);color:#1a1a1a;}
+  .pkg-card h4{margin:6px 0 4px;font-size:1.05rem;color:var(--navy);}
+  .pkg-card.premium h4{color:#fff;}
+  .pkg-card .price{font-size:1.55rem;font-weight:bold;color:var(--red);margin:4px 0 2px;}
+  .pkg-card.premium .price{color:var(--gold);}
+  .pkg-card .period{font-size:0.78rem;color:var(--gray);margin-bottom:12px;}
+  .pkg-card.premium .period{color:#cfd7e6;}
+  .pkg-card p.desc{font-size:0.87rem;margin:0 0 10px;flex-grow:1;}
+  .pkg-card .fit{font-size:0.78rem;font-style:italic;color:var(--navy-light);border-top:1px solid var(--border);padding-top:10px;margin-top:auto;}
+  .pkg-card.premium .fit{color:#e6cf8a;border-top:1px solid rgba(255,255,255,0.25);}
+  .pkg-card .save{
+    display:inline-block;margin-top:6px;font-size:0.75rem;font-weight:bold;
+    background:#E2EFDA;color:#375623;padding:2px 8px;border-radius:10px;
+  }
+
+  .contact-card{
+    display:flex;flex-wrap:wrap;gap:24px;align-items:center;
+    background:linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+    color:#fff;border-radius:10px;padding:28px 32px;margin-top:16px;
+  }
+  .contact-card .who{flex:1;min-width:220px;}
+  .contact-card .who h3{color:#fff;margin:0 0 4px;font-size:1.2rem;}
+  .contact-card .who p{margin:0;color:#dfe7f5;font-size:0.9rem;}
+  .contact-card .actions{display:flex;gap:12px;flex-wrap:wrap;}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:12px 20px;border-radius:24px;text-decoration:none;
+    font-weight:bold;font-size:0.9rem;border:none;cursor:pointer;font-family:inherit;
+  }
+  .btn.whatsapp{background:#25D366;color:#0b3d0b;}
+  .btn.call{background:#fff;color:var(--navy);}
+  .btn.mail{background:#F4B400;color:#3a2a00;}
+
+  footer{
+    text-align:center;color:var(--gray);font-size:0.8rem;
+    padding:30px 24px 50px;
+  }
+  .edit-link{
+    color:#b8bfc9;font-size:0.72rem;text-decoration:underline;
+  }
+  .edit-link:hover{color:var(--gray);}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="inner">
+    <h1>PUNTO DE PARTIDA</h1>
+    <p class="tagline">El programa periodístico líder de Tucumán · 32 años en el aire</p>
+    <p class="pitch">Sumá tu marca al espacio de referencia de la conversación política, económica y social de la provincia. Audiencia calificada, presencia multiplataforma y la conducción de Pedro García.</p>
+    <div class="meta">
+      <span>📺 Canal 10 Tucumán</span>
+      <span>🗓️ Domingos 19:00 hs</span>
+      <span>🎙️ Conducción: Pedro García</span>
+      <span>🌐 puntodepartidatv.com</span>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs">
+  <div class="inner">
+    <a href="#programa">El programa</a>
+    <a href="#porque">Por qué sumarse</a>
+    <a href="#paquetes">Paquetes</a>
+    <a href="#contacto" class="cta">Hablemos →</a>
+  </div>
+</nav>
+
+<main>
+
+  <section id="programa">
+    <h2>Sobre Punto de Partida</h2>
+    <p id="progDescripcion">Punto de Partida es un programa periodístico político, líder en su género, que se emite desde hace 32 años en Tucumán. Se caracteriza por el pluralismo, el ejercicio ético del periodismo y el estímulo del razonamiento crítico sobre la realidad política, económica y social de la provincia y el país — un espacio que marca agenda cada domingo.</p>
+    <div class="grid-facts">
+      <div class="label">Canal</div><div id="factCanal">Canal 10 de Tucumán</div>
+      <div class="label">Día y horario</div><div id="factDiaHorario">Domingos, 19:00 hs</div>
+      <div class="label">Conducción</div><div id="factConduccion">Pedro García</div>
+      <div class="label">Género</div><div id="factGenero">Periodístico — político / económico / social</div>
+      <div class="label">Antigüedad</div><div id="factAntiguedad">32 años en el aire</div>
+      <div class="label">Sitio web</div><div id="factWeb">puntodepartidatv.com</div>
+    </div>
+
+    <h3>Pedro García — Conductor</h3>
+    <p id="pedroBio">Periodista, productor y conductor. Fue durante 30 años Director del Departamento Informativo de CCC (seis veces premiado como mejor informativo del interior del país por ATVC), hasta 2024. Diplomado en «Economía para Periodistas». Profesor Adjunto a cargo de la Cátedra de Periodismo Televisivo en la Universidad del Norte Santo Tomás de Aquino (UNSTA). Un referente del periodismo tucumano con más de 40 años de trayectoria en el medio.</p>
+  </section>
+
+  <section id="porque">
+    <h2>Por qué sumar tu marca a Punto de Partida</h2>
+    <div class="why-grid" id="porqueGrid">
+      <div class="why-card">
+        <h4>Liderazgo consolidado</h4>
+        <p>32 años ininterrumpidos como programa líder del género periodístico-político en Tucumán.</p>
+      </div>
+      <div class="why-card">
+        <h4>Audiencia calificada</h4>
+        <p>Un público formado por tomadores de decisión: empresarios, dirigentes políticos, profesionales y líderes de opinión de la provincia.</p>
+      </div>
+      <div class="why-card">
+        <h4>Presencia multiplataforma</h4>
+        <p>TV abierta en horario prime, sitio web propio con cobertura diaria y redes sociales activas (Instagram, Facebook, X, YouTube).</p>
+      </div>
+      <div class="why-card">
+        <h4>Credibilidad y prestigio</h4>
+        <p>Conducido por Pedro García, una voz de referencia con más de tres décadas construyendo confianza con la audiencia tucumana.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="paquetes">
+    <h2>Paquetes de auspicio</h2>
+    <p>Cinco formas de sumar tu marca a Punto de Partida, desde una mención puntual hasta el sponsoreo integral del programa.</p>
+
+    <div class="pkg-grid" id="paquetesGrid">
+      <div class="pkg-card">
+        <h4>Pase publicitario</h4>
+        <div class="price">$60.000</div>
+        <div class="period">por programa</div>
+        <p class="desc">Mención institucional en vivo durante la emisión dominical.</p>
+        <div class="fit">Ideal para campañas puntuales o para probar la pauta.</div>
+      </div>
+
+      <div class="pkg-card">
+        <span class="tag">El más elegido</span>
+        <h4>Paquete mensual</h4>
+        <div class="price">$200.000</div>
+        <div class="period">por mes · 4 menciones</div>
+        <p class="desc">Una mención en vivo en cada una de las 4 emisiones del mes.</p>
+        <span class="save">Ahorrás $40.000 vs. pases sueltos</span>
+        <div class="fit">Ideal para presencia sostenida durante todo el mes.</div>
+      </div>
+
+      <div class="pkg-card">
+        <h4>Presencia digital</h4>
+        <div class="price">$120.000</div>
+        <div class="period">por programa o por tema</div>
+        <p class="desc">Tu marca en la web y redes de Punto de Partida (Instagram, Facebook y X), asociada a la emisión o a un tema de actualidad puntual.</p>
+        <div class="fit">Ideal para marcas que buscan conversación y viralización.</div>
+      </div>
+
+      <div class="pkg-card">
+        <h4>Auspicio de columna</h4>
+        <div class="price">$500.000</div>
+        <div class="period">por mes</div>
+        <p class="desc">Sponsoreás en exclusiva una columna del programa, con temática acorde al rubro de tu marca. Presencia en TV, web y redes.</p>
+        <div class="fit">Ideal para posicionar tu marca como referente en un tema.</div>
+      </div>
+
+      <div class="pkg-card premium">
+        <span class="tag">Premium</span>
+        <h4>Sponsor oficial del programa</h4>
+        <div class="price">$1.200.000</div>
+        <div class="period">por mes</div>
+        <p class="desc">Tu logo presente en toda la editorial de Punto de Partida: programa en vivo, reels, redes y web. Máxima exposición y asociación con el programa líder del género en Tucumán.</p>
+        <div class="fit">Ideal para marcas que buscan liderazgo y máxima visibilidad.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contacto">
+    <h2>Hablemos</h2>
+    <p>Contactanos para diseñar juntos la propuesta de auspicio que mejor se adapte a tu marca.</p>
+    <div class="contact-card">
+      <div class="who">
+        <h3 id="contactName">Eugenia García Sacco</h3>
+        <p id="contactCargo">Área Comercial · Punto de Partida</p>
+      </div>
+      <div class="actions">
+        <a class="btn whatsapp" id="waBtn" href="https://wa.me/5493815995785" target="_blank" rel="noopener">💬 WhatsApp</a>
+        <a class="btn call" id="callBtn" href="tel:+5493815995785">📞 <span id="phoneText">+54 9 3815 99-5785</span></a>
+        <a class="btn mail" id="mailBtn" href="mailto:puntodepartidacontacto@gmail.com">✉️ <span id="emailText">puntodepartidacontacto@gmail.com</span></a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  Punto de Partida · puntodepartidatv.com · Julio 2026
+  <div><a class="edit-link" href="https://airtable.com/appO14nTu6ULZyhQ6" target="_blank" rel="noopener">Editar contenido en Airtable</a></div>
+</footer>
+
+<script>
+(function(){
+  // ============================================================
+  // Contenido en vivo desde Airtable
+  // ------------------------------------------------------------
+  // Esta página intenta traer el contenido actualizado (precios,
+  // textos, contacto) desde Airtable cada vez que se abre.
+  // Si el token no está configurado, o falla la conexión, la
+  // página sigue funcionando con el contenido de respaldo que ya
+  // está escrito arriba en el HTML.
+  //
+  // Para activarlo, pegá abajo un Personal Access Token de
+  // Airtable de SOLO LECTURA, limitado únicamente a esta base
+  // (Punto de Partida — Dossier (público), appO14nTu6ULZyhQ6).
+  // Instrucciones completas al pie de este archivo / en el chat.
+  // ============================================================
+  const AIRTABLE_BASE_ID = 'appO14nTu6ULZyhQ6';
+  const AIRTABLE_TOKEN = 'patc1Kv4dWZwwREub.104a298500d485404f053bcb7418c7827ea17b32daaefd07e90a98c137e02666';
+
+  async function airtableFetch(table, query){
+    const url = 'https://api.airtable.com/v0/' + AIRTABLE_BASE_ID + '/' + encodeURIComponent(table) + (query || '');
+    const res = await fetch(url, { headers: { Authorization: 'Bearer ' + AIRTABLE_TOKEN } });
+    if(!res.ok) throw new Error('Airtable ' + table + ': ' + res.status);
+    return res.json();
+  }
+
+  function setText(id, value){
+    if(value === undefined || value === null || value === '') return;
+    const el = document.getElementById(id);
+    if(el) el.textContent = value;
+  }
+
+  function renderPrograma(f){
+    setText('progDescripcion', f.Descripcion);
+    setText('factCanal', f.Canal);
+    setText('factDiaHorario', f.DiaHorario);
+    setText('factConduccion', f.Conduccion);
+    setText('factGenero', f.Genero);
+    setText('factAntiguedad', f.Antiguedad);
+    setText('factWeb', f.Web);
+    setText('pedroBio', f.PedroBio);
+  }
+
+  function renderPorque(records){
+    const grid = document.getElementById('porqueGrid');
+    grid.innerHTML = '';
+    records.forEach(r => {
+      const f = r.fields;
+      const card = document.createElement('div');
+      card.className = 'why-card';
+      const h4 = document.createElement('h4');
+      h4.textContent = f.Titulo || '';
+      const p = document.createElement('p');
+      p.textContent = f.Texto || '';
+      card.appendChild(h4);
+      card.appendChild(p);
+      grid.appendChild(card);
+    });
+  }
+
+  function renderPaquetes(records){
+    const grid = document.getElementById('paquetesGrid');
+    grid.innerHTML = '';
+    records.forEach(r => {
+      const f = r.fields;
+      const card = document.createElement('div');
+      card.className = 'pkg-card' + (f.Premium ? ' premium' : '');
+
+      if(f.Tag){
+        const tag = document.createElement('span');
+        tag.className = 'tag';
+        tag.textContent = f.Tag;
+        card.appendChild(tag);
+      }
+      const h4 = document.createElement('h4');
+      h4.textContent = f.Nombre || '';
+      card.appendChild(h4);
+
+      const price = document.createElement('div');
+      price.className = 'price';
+      price.textContent = f.Precio || '';
+      card.appendChild(price);
+
+      const period = document.createElement('div');
+      period.className = 'period';
+      period.textContent = f.Periodo || '';
+      card.appendChild(period);
+
+      const desc = document.createElement('p');
+      desc.className = 'desc';
+      desc.textContent = f.Descripcion || '';
+      card.appendChild(desc);
+
+      if(f.Save){
+        const save = document.createElement('span');
+        save.className = 'save';
+        save.textContent = f.Save;
+        card.appendChild(save);
+      }
+
+      const fit = document.createElement('div');
+      fit.className = 'fit';
+      fit.textContent = f.Fit || '';
+      card.appendChild(fit);
+
+      grid.appendChild(card);
+    });
+  }
+
+  function renderContacto(f){
+    setText('contactName', f.Nombre);
+    setText('contactCargo', f.Cargo);
+    if(f.Telefono){
+      document.getElementById('phoneText').textContent = f.Telefono;
+      const digits = String(f.Telefono).replace(/[^0-9]/g, '');
+      if(digits){
+        document.getElementById('waBtn').href = 'https://wa.me/' + digits;
+        document.getElementById('callBtn').href = 'tel:+' + digits;
+      }
+    }
+    if(f.Email){
+      document.getElementById('emailText').textContent = f.Email;
+      document.getElementById('mailBtn').href = 'mailto:' + f.Email;
+    }
+  }
+
+  async function loadFromAirtable(){
+    if(!AIRTABLE_TOKEN || AIRTABLE_TOKEN.indexOf('PEGA_AQUI') === 0){
+      console.info('Punto de Partida: token de Airtable no configurado — se muestra el contenido de respaldo.');
+      return;
+    }
+    try{
+      const [programa, porque, paquetes, contacto] = await Promise.all([
+        airtableFetch('Programa'),
+        airtableFetch('PorQue', '?sort%5B0%5D%5Bfield%5D=Orden&sort%5B0%5D%5Bdirection%5D=asc'),
+        airtableFetch('Paquetes', '?sort%5B0%5D%5Bfield%5D=Orden&sort%5B0%5D%5Bdirection%5D=asc'),
+        airtableFetch('Contacto'),
+      ]);
+      if(programa.records && programa.records[0]) renderPrograma(programa.records[0].fields);
+      if(porque.records && porque.records.length) renderPorque(porque.records);
+      if(paquetes.records && paquetes.records.length) renderPaquetes(paquetes.records);
+      if(contacto.records && contacto.records[0]) renderContacto(contacto.records[0].fields);
+    }catch(e){
+      console.warn('Punto de Partida: no se pudo cargar el contenido en vivo de Airtable, se muestra el contenido de respaldo.', e);
+    }
+  }
+
+  loadFromAirtable();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Punto de Partida — Prospectos Comerciales</title>
+<style>
+  :root{
+    --navy:#1F3864;
+    --navy-light:#2E5395;
+    --red:#C00000;
+    --gray:#595959;
+    --light:#DCE6F1;
+    --border:#D9D9D9;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:Arial, Helvetica, sans-serif;
+    color:#222;
+    background:#f4f6f9;
+    line-height:1.5;
+  }
+  header{
+    background:linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+    color:#fff;
+    padding:28px 24px;
+  }
+  header .inner{max-width:1200px;margin:0 auto;}
+  header h1{margin:0 0 4px;font-size:1.7rem;}
+  header p{margin:0;color:#dfe7f5;font-size:0.9rem;}
+  main{max-width:1200px;margin:0 auto;padding:20px 24px 60px;}
+  .toolbar{
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+    background:#fff;border:1px solid var(--border);border-radius:8px;
+    padding:14px 18px;margin-bottom:16px;
+  }
+  .toolbar input[type="text"]{
+    flex:1;min-width:200px;padding:9px 12px;border:1px solid var(--border);
+    border-radius:6px;font-size:0.9rem;font-family:inherit;
+  }
+  .btn{
+    border:none;border-radius:6px;padding:9px 16px;font-size:0.85rem;font-weight:bold;
+    cursor:pointer;font-family:inherit;
+  }
+  .btn.primary{background:var(--navy);color:#fff;}
+  .btn.primary:hover{background:var(--navy-light);}
+  .btn.accent{background:var(--red);color:#fff;}
+  .btn.accent:hover{background:#a30000;}
+  .btn.ghost{background:#fff;color:var(--navy);border:1px solid var(--navy);}
+  .btn.ghost:hover{background:var(--light);}
+  .btn.small{padding:4px 8px;font-size:0.72rem;border-radius:4px;}
+  .table-wrap{
+    background:#fff;border:1px solid var(--border);border-radius:8px;
+    overflow-x:auto;
+  }
+  table{width:100%;border-collapse:collapse;font-size:0.88rem;min-width:900px;}
+  thead th{
+    background:var(--navy);color:#fff;text-align:left;
+    padding:10px 12px;font-size:0.8rem;position:relative;white-space:nowrap;
+  }
+  thead th[contenteditable]{cursor:text;}
+  thead th .col-actions{
+    display:inline-block;margin-left:6px;opacity:0.6;cursor:pointer;
+    font-size:0.75rem;
+  }
+  thead th .col-actions:hover{opacity:1;color:#ffb3b3;}
+  th.actions-col, td.actions-col{width:46px;text-align:center;white-space:nowrap;}
+  tbody td{
+    padding:9px 12px;border-bottom:1px solid var(--border);
+    vertical-align:top;min-width:120px;
+  }
+  tbody td[contenteditable]:hover{background:#fafcff;}
+  tbody td[contenteditable]:focus{outline:2px solid var(--navy-light);outline-offset:-2px;background:#fff;}
+  tbody tr:nth-child(even) td{background:#f8f9fb;}
+  tbody tr.hidden{display:none;}
+  .del-row-btn, .del-col-btn{
+    background:none;border:none;cursor:pointer;color:#c00;font-size:0.95rem;
+  }
+  .del-row-btn:hover{color:#ff4d4d;}
+  .add-row-cell{text-align:center;padding:12px;}
+  .add-row-cell button{width:100%;}
+  .note{
+    font-size:0.82rem;color:var(--gray);margin-top:14px;
+    background:#fff;border-left:3px solid var(--red);padding:10px 14px;border-radius:0 4px 4px 0;
+  }
+  .count{font-size:0.8rem;color:var(--gray);margin-left:auto;white-space:nowrap;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="inner">
+    <h1>Punto de Partida — Prospectos Comerciales</h1>
+    <p>Planilla editable: hacé clic en cualquier celda para editarla, agregá filas o columnas nuevas, y descargá una copia actualizada cuando termines.</p>
+  </div>
+</header>
+
+<main>
+  <div class="toolbar">
+    <input type="text" id="searchBox" placeholder="Buscar en la lista (empresa, rubro, contacto...)">
+    <button class="btn primary" id="addColBtn">+ Columna</button>
+    <button class="btn accent" id="downloadBtn">⬇ Descargar copia actualizada</button>
+    <span class="count" id="rowCount"></span>
+  </div>
+
+  <div class="table-wrap">
+    <table id="prospectsTable">
+      <thead>
+        <tr id="headerRow">
+          <th contenteditable="true">Rubro</th>
+          <th contenteditable="true">Empresa / Marca</th>
+          <th contenteditable="true">Contacto</th>
+          <th contenteditable="true">Teléfono</th>
+          <th contenteditable="true">Email</th>
+          <th contenteditable="true">Estado</th>
+          <th contenteditable="true">Notas</th>
+          <th class="actions-col">⚙</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+      </tbody>
+    </table>
+  </div>
+
+  <div style="margin-top:12px;">
+    <button class="btn ghost" id="addRowBtn">+ Agregar fila</button>
+  </div>
+
+  <div class="note">
+    Los datos de contacto quedan a completar y verificar por el equipo comercial. Para guardar los cambios de forma permanente, usá «Descargar copia actualizada»: se genera un nuevo archivo HTML con todo lo editado, que reemplaza al anterior.
+  </div>
+</main>
+
+<script>
+(function(){
+  const headerRow = document.getElementById('headerRow');
+  const tableBody = document.getElementById('tableBody');
+  const searchBox = document.getElementById('searchBox');
+  const rowCountEl = document.getElementById('rowCount');
+
+  const initialData = [
+    ["Agroindustria (limón/citrus)", "San Miguel", "", "", "", "Por contactar", "Mayor citrícola de Tucumán, líder mundial en exportación de limón"],
+    ["Agroindustria (limón/citrus)", "Citrusvil", "", "", "", "Por contactar", "Principal productora de limones; Grupo Lucci"],
+    ["Agroindustria (azúcar)", "Ingenio Concepción", "", "", "", "Por contactar", "Industria azucarera tucumana"],
+    ["Agroindustria (azúcar)", "Ingenio La Florida", "", "", "", "Por contactar", "Industria azucarera tucumana"],
+    ["Bancos y finanzas", "Banco Macro", "", "", "", "Por contactar", "Origen y fuerte presencia en Tucumán"],
+    ["Bancos y finanzas", "BBVA / Banco del Tucumán", "", "", "", "Por contactar", "Banca regional"],
+    ["Seguros", "Sancor Seguros", "", "", "", "Por contactar", "Aseguradora con oficina en Tucumán"],
+    ["Seguros", "La Caja Seguros", "", "", "", "Por contactar", "Aseguradora con oficina en Tucumán"],
+    ["Salud y bienestar", "OSDE", "", "", "", "Por contactar", "Medicina prepaga, delegación Tucumán"],
+    ["Salud y bienestar", "Swiss Medical", "", "", "", "Por contactar", "Medicina prepaga, delegación Tucumán"],
+    ["Salud y bienestar", "Clínica Mayo", "", "", "", "Por contactar", "Primer sanatorio polivalente del norte argentino acreditado por ITAES"],
+    ["Salud y bienestar", "Sanatorio 9 de Julio", "", "", "", "Por contactar", "Hospital privado polivalente de alta complejidad"],
+    ["Salud y bienestar", "Sanatorio Rivadavia", "", "", "", "Por contactar", "Sanatorio privado, Virgen de la Merced 546"],
+    ["Retail y consumo", "Grupo Libertad (supermercados)", "", "", "", "Por contactar", "Cadena de supermercados de origen tucumano"],
+    ["Retail y consumo", "La Anónima", "", "", "", "Por contactar", "Cadena de supermercados con sucursales en Tucumán"],
+    ["Inmobiliario y construcción", "Guzmán & Guzmán", "", "", "", "Por contactar", "Desarrolladora líder del NOA; oficinas en capital y Yerba Buena"],
+    ["Inmobiliario y construcción", "ISN Inmobiliaria & Desarrollos", "", "", "", "Por contactar", "+25 años en el mercado inmobiliario, financiamiento propio"],
+    ["Inmobiliario y construcción", "Terán Inmobiliaria", "", "", "", "Por contactar", "Activa desde 1986 en San Miguel de Tucumán y la provincia"],
+    ["Inmobiliario y construcción", "CM Desarrollos Inmobiliarios", "", "", "", "Por contactar", "Compraventa, alquileres y desarrollo de proyectos"],
+    ["Inmobiliario y construcción", "Ostengo Inmobiliaria", "", "", "", "Por contactar", "Oficina en Marcos Paz 837, San Miguel de Tucumán"],
+    ["Inmobiliario y construcción", "Arcos Construcción", "", "", "", "Por contactar", "Obras civiles, infraestructura e industria, +50 años en el NOA"],
+    ["Automotor", "Autocero (Hyundai Tucumán)", "", "", "", "Por contactar", "Único concesionario oficial Hyundai en Tucumán, 25 años en el mercado"],
+    ["Educación", "UNSTA", "", "", "", "Por contactar", "Vínculo directo: Pedro García es profesor adjunto allí"],
+    ["Educación", "Universidad San Pablo-T", "", "", "", "Por contactar", "Primera universidad privada laica del NOA"],
+    ["Turismo y hotelería", "Sheraton Tucumán Hotel", "", "", "", "Por contactar", "Hotel 4 estrellas, segmento corporativo/turístico"],
+    ["Turismo y hotelería", "Hotel Metropol", "", "", "", "Por contactar", "Hotel 4 estrellas céntrico, familias y viajeros de negocios"],
+    ["Turismo y hotelería", "Hilton Garden Inn Tucumán", "", "", "", "Por contactar", "Hotel 3.5 estrellas, cadena internacional"],
+    ["Estudios profesionales", "Estudios contables / jurídicos (a definir)", "", "", "", "Por definir", "Relevar estudios locales vinculados a economía/finanzas, afines al perfil del programa"],
+    ["Gastronomía", "Cadenas y restaurantes locales (a definir)", "", "", "", "Por definir", "Relevar marcas gastronómicas de San Miguel de Tucumán"],
+  ];
+
+  function colCount(){
+    return headerRow.children.length - 1; // exclude actions column
+  }
+
+  function buildRow(values){
+    const tr = document.createElement('tr');
+    const n = colCount();
+    for(let i=0;i<n;i++){
+      const td = document.createElement('td');
+      td.contentEditable = "true";
+      td.textContent = values && values[i] ? values[i] : "";
+      tr.appendChild(td);
+    }
+    const actionTd = document.createElement('td');
+    actionTd.className = "actions-col";
+    const delBtn = document.createElement('button');
+    delBtn.className = "del-row-btn";
+    delBtn.title = "Eliminar fila";
+    delBtn.textContent = "🗑";
+    actionTd.appendChild(delBtn);
+    tr.appendChild(actionTd);
+    return tr;
+  }
+
+  function loadInitial(){
+    // Si la tabla ya tiene filas (por ejemplo, al reabrir una copia ya editada
+    // y descargada), no volvemos a cargar los datos originales — evita duplicados.
+    if(tableBody.children.length > 0){
+      updateCount();
+      return;
+    }
+    initialData.forEach(row => tableBody.appendChild(buildRow(row)));
+    updateCount();
+  }
+
+  function updateCount(){
+    const total = tableBody.querySelectorAll('tr').length;
+    rowCountEl.textContent = total + " empresas";
+  }
+
+  // Row delete (event delegation)
+  tableBody.addEventListener('click', function(e){
+    const btn = e.target.closest('.del-row-btn');
+    if(!btn) return;
+    const tr = btn.closest('tr');
+    if(confirm('¿Eliminar esta fila?')){
+      tr.remove();
+      updateCount();
+    }
+  });
+
+  // Add row
+  document.getElementById('addRowBtn').addEventListener('click', function(){
+    const tr = buildRow([]);
+    tableBody.appendChild(tr);
+    updateCount();
+    const firstCell = tr.querySelector('td');
+    if(firstCell){ firstCell.focus(); }
+    if(typeof tr.scrollIntoView === 'function'){
+      tr.scrollIntoView({behavior:'smooth', block:'center'});
+    }
+  });
+
+  // Add column
+  document.getElementById('addColBtn').addEventListener('click', function(){
+    const label = prompt('Nombre de la nueva columna:', 'Nueva columna');
+    if(label === null) return;
+    const th = document.createElement('th');
+    th.contentEditable = "true";
+    th.textContent = label || 'Nueva columna';
+    const delSpan = document.createElement('span');
+    delSpan.className = 'col-actions del-col-btn';
+    delSpan.title = 'Eliminar columna';
+    delSpan.textContent = '✕';
+    th.appendChild(delSpan);
+    headerRow.insertBefore(th, headerRow.lastElementChild);
+
+    Array.from(tableBody.children).forEach(tr => {
+      const td = document.createElement('td');
+      td.contentEditable = "true";
+      tr.insertBefore(td, tr.lastElementChild);
+    });
+  });
+
+  // Column delete (event delegation on header)
+  headerRow.addEventListener('click', function(e){
+    const btn = e.target.closest('.del-col-btn');
+    if(!btn) return;
+    e.stopPropagation();
+    const th = btn.closest('th');
+    const index = Array.from(headerRow.children).indexOf(th);
+    if(colCount() <= 1){
+      alert('Tiene que quedar al menos una columna.');
+      return;
+    }
+    if(!confirm('¿Eliminar esta columna en toda la tabla?')) return;
+    th.remove();
+    Array.from(tableBody.children).forEach(tr => {
+      const cell = tr.children[index];
+      if(cell) cell.remove();
+    });
+  });
+
+  // Search filter
+  searchBox.addEventListener('input', function(){
+    const q = searchBox.value.trim().toLowerCase();
+    Array.from(tableBody.children).forEach(tr => {
+      const text = tr.textContent.toLowerCase();
+      tr.classList.toggle('hidden', q !== '' && !text.includes(q));
+    });
+  });
+
+  // Download updated copy
+  document.getElementById('downloadBtn').addEventListener('click', function(){
+    searchBox.value = '';
+    Array.from(tableBody.children).forEach(tr => tr.classList.remove('hidden'));
+
+    const clone = document.documentElement.cloneNode(true);
+    // Remove leftover column-action spans duplication issues: none needed, cloneNode keeps as-is.
+    const htmlStr = '<!DOCTYPE html>\n' + clone.outerHTML;
+    const blob = new Blob([htmlStr], {type: 'text/html'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'Prospectos_Punto_de_Partida.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+
+  loadInitial();
+})();
+</script>
+
+</body>
+</html>

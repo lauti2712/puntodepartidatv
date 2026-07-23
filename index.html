@@ -289,23 +289,15 @@
 
   <section id="paquetes">
     <h2>Paquetes de auspicio</h2>
-    <p>Distintas formas de sumar tu marca a Punto de Partida, desde un spot puntual hasta el sponsoreo integral del programa.</p>
+    <p>Cinco formas de sumar tu marca a Punto de Partida, desde una mención puntual hasta el sponsoreo integral del programa.</p>
 
     <div class="pkg-grid" id="paquetesGrid">
       <div class="pkg-card">
-        <h4>Spot publicitario</h4>
+        <h4>Pase publicitario</h4>
         <div class="price">$60.000</div>
         <div class="period">por programa</div>
-        <p class="desc">Paso de un spot publicitario de hasta 20 segundos durante la transmisión en vivo, por TV y en la transmisión de YouTube.</p>
+        <p class="desc">Mención institucional en vivo durante la emisión dominical.</p>
         <div class="fit">Ideal para campañas puntuales o para probar la pauta.</div>
-      </div>
-
-      <div class="pkg-card">
-        <h4>Auspiciante del programa</h4>
-        <div class="price">$150.000</div>
-        <div class="period">por mes</div>
-        <p class="desc">Tu logo se menciona al inicio y al cierre de cada transmisión del programa.</p>
-        <div class="fit">Ideal para marcas que buscan presencia constante a bajo costo relativo.</div>
       </div>
 
       <div class="pkg-card">
@@ -313,17 +305,17 @@
         <h4>Paquete mensual</h4>
         <div class="price">$200.000</div>
         <div class="period">por mes · 4 menciones</div>
-        <p class="desc">4 spots publicitarios (uno por emisión del mes), de hasta 20 segundos en TV y YouTube.</p>
-        <span class="save">Ahorrás $40.000 vs. spots sueltos</span>
+        <p class="desc">Una mención en vivo en cada una de las 4 emisiones del mes.</p>
+        <span class="save">Ahorrás $40.000 vs. pases sueltos</span>
         <div class="fit">Ideal para presencia sostenida durante todo el mes.</div>
       </div>
 
       <div class="pkg-card">
-        <h4>PubliNota</h4>
-        <div class="price">$300.000</div>
-        <div class="period">por nota</div>
-        <p class="desc">Nota publicitaria/entrevista a la marca dentro del programa. Sumá la publicación de un reel publicitario de tu marca por +$100.000.</p>
-        <div class="fit">Ideal para marcas que quieren contar su historia en formato de entrevista.</div>
+        <h4>Presencia digital</h4>
+        <div class="price">$120.000</div>
+        <div class="period">por programa o por tema</div>
+        <p class="desc">Tu marca en la web y redes de Punto de Partida (Instagram, Facebook y X), asociada a la emisión o a un tema de actualidad puntual.</p>
+        <div class="fit">Ideal para marcas que buscan conversación y viralización.</div>
       </div>
 
       <div class="pkg-card">
@@ -332,14 +324,6 @@
         <div class="period">por mes</div>
         <p class="desc">Sponsoreás en exclusiva una columna del programa, con temática acorde al rubro de tu marca. Presencia en TV, web y redes.</p>
         <div class="fit">Ideal para posicionar tu marca como referente en un tema.</div>
-      </div>
-
-      <div class="pkg-card">
-        <h4>Product Placement en TV</h4>
-        <div class="price">$900.000</div>
-        <div class="period">por mes</div>
-        <p class="desc">Upgrade del Auspicio de Columna: tu producto o marca integrado de forma orgánica dentro del contenido en vivo del programa.</p>
-        <div class="fit">Ideal para marcas que buscan integración natural con el contenido.</div>
       </div>
 
       <div class="pkg-card premium">
@@ -373,31 +357,38 @@
 
 <footer>
   Punto de Partida · puntodepartidatv.com · Julio 2026
-  <div><a class="edit-link" href="https://airtable.com/appO14nTu6ULZyhQ6" target="_blank" rel="noopener">Editar contenido en Airtable</a></div>
+  <div><a class="edit-link" href="admin.html">Editar contenido</a></div>
 </footer>
 
-<script>
-(function(){
+<script type="module">
   // ============================================================
-  // Contenido en vivo desde Airtable
+  // Contenido en vivo desde Firebase (Firestore)
   // ------------------------------------------------------------
-  // Esta página intenta traer el contenido actualizado (precios,
-  // textos, métricas, contacto) desde Airtable cada vez que se abre.
-  // Si el token no está configurado, o falla la conexión, la
+  // Esta página trae el contenido actualizado (textos, métricas,
+  // paquetes, contacto) desde Firestore cada vez que se abre.
+  // Si Firestore todavía no tiene datos, o falla la conexión, la
   // página sigue funcionando con el contenido de respaldo que ya
   // está escrito arriba en el HTML.
   //
-  // Base: Punto de Partida — Dossier (público), appO14nTu6ULZyhQ6
+  // El contenido se edita desde admin.html (requiere login).
   // ============================================================
-  const AIRTABLE_BASE_ID = 'appO14nTu6ULZyhQ6';
-  const AIRTABLE_TOKEN = 'patc1Kv4dWZwwREub.104a298500d485404f053bcb7418c7827ea17b32daaefd07e90a98c137e02666';
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getFirestore, doc, getDoc, collection, getDocs, query, orderBy
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-  async function airtableFetch(table, query){
-    const url = 'https://api.airtable.com/v0/' + AIRTABLE_BASE_ID + '/' + encodeURIComponent(table) + (query || '');
-    const res = await fetch(url, { headers: { Authorization: 'Bearer ' + AIRTABLE_TOKEN } });
-    if(!res.ok) throw new Error('Airtable ' + table + ': ' + res.status);
-    return res.json();
-  }
+  const firebaseConfig = {
+    apiKey: "AIzaSyDFJ7G9lIygFLuzuaCct_dxos9JM7MhYpQ",
+    authDomain: "puntodepartidatv-6a64b.firebaseapp.com",
+    projectId: "puntodepartidatv-6a64b",
+    storageBucket: "puntodepartidatv-6a64b.firebasestorage.app",
+    messagingSenderId: "1006640955584",
+    appId: "1:1006640955584:web:4421116b57e4dc56fead25",
+    measurementId: "G-MNJ19DQH82"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
   function setText(id, value){
     if(value === undefined || value === null || value === '') return;
@@ -406,147 +397,142 @@
   }
 
   function renderPrograma(f){
-    setText('progDescripcion', f.Descripcion);
-    setText('factCanal', f.Canal);
-    setText('factDiaHorario', f.DiaHorario);
-    setText('factConduccion', f.Conduccion);
-    setText('factGenero', f.Genero);
-    setText('factAntiguedad', f.Antiguedad);
-    setText('factWeb', f.Web);
-    setText('pedroBio', f.PedroBio);
+    setText('progDescripcion', f.descripcion);
+    setText('factCanal', f.canal);
+    setText('factDiaHorario', f.diaHorario);
+    setText('factConduccion', f.conduccion);
+    setText('factGenero', f.genero);
+    setText('factAntiguedad', f.antiguedad);
+    setText('factWeb', f.web);
+    setText('pedroBio', f.pedroBio);
   }
 
   function renderMetricas(f){
-    setText('metPeriodo', f.Periodo ? ('Reporte digital multicanal · ' + f.Periodo + ' · Facebook, Instagram, YouTube y TikTok') : undefined);
-    setText('metViz', f.Visualizaciones);
-    setText('metUsuarios', f.UsuariosUnicos);
-    setText('metInteracciones', f.Interacciones);
-    setText('metSeguidores', f.NuevosSeguidores);
-    setText('metVisitas', f.VisitasWeb);
-    setText('metMejorMes', f.MejorMesNota);
-    setText('metArgentina', f.PctArgentina);
-    setText('metHombres', f.PctHombres);
-    setText('metMujeres', f.PctMujeres);
-    setText('met45mas', f.Pct45Mas);
-    setText('metNotaAudiencia', f.NotaAudiencia);
-    setText('metFbDato', f.FacebookDato);
-    setText('metFbNota', f.FacebookNota);
-    setText('metIgDato', f.InstagramDato);
-    setText('metIgNota', f.InstagramNota);
-    setText('metYtDato', f.YoutubeDato);
-    setText('metYtNota', f.YoutubeNota);
-    setText('metTkDato', f.TiktokDato);
-    setText('metTkNota', f.TiktokNota);
+    setText('metPeriodo', f.periodo ? ('Reporte digital multicanal · ' + f.periodo + ' · Facebook, Instagram, YouTube y TikTok') : undefined);
+    setText('metViz', f.visualizaciones);
+    setText('metUsuarios', f.usuariosUnicos);
+    setText('metInteracciones', f.interacciones);
+    setText('metSeguidores', f.nuevosSeguidores);
+    setText('metVisitas', f.visitasWeb);
+    setText('metMejorMes', f.mejorMesNota);
+    setText('metArgentina', f.pctArgentina);
+    setText('metHombres', f.pctHombres);
+    setText('metMujeres', f.pctMujeres);
+    setText('met45mas', f.pct45Mas);
+    setText('metNotaAudiencia', f.notaAudiencia);
+    setText('metFbDato', f.facebookDato);
+    setText('metFbNota', f.facebookNota);
+    setText('metIgDato', f.instagramDato);
+    setText('metIgNota', f.instagramNota);
+    setText('metYtDato', f.youtubeDato);
+    setText('metYtNota', f.youtubeNota);
+    setText('metTkDato', f.tiktokDato);
+    setText('metTkNota', f.tiktokNota);
   }
 
-  function renderPorque(records){
+  function renderContacto(f){
+    setText('contactName', f.nombre);
+    setText('contactCargo', f.cargo);
+    if(f.telefono){
+      document.getElementById('phoneText').textContent = f.telefono;
+      const digits = String(f.telefono).replace(/[^0-9]/g, '');
+      if(digits){
+        document.getElementById('waBtn').href = 'https://wa.me/' + digits;
+        document.getElementById('callBtn').href = 'tel:+' + digits;
+      }
+    }
+    if(f.email){
+      document.getElementById('emailText').textContent = f.email;
+      document.getElementById('mailBtn').href = 'mailto:' + f.email;
+    }
+  }
+
+  function renderPorque(items){
+    if(!items.length) return;
     const grid = document.getElementById('porqueGrid');
     grid.innerHTML = '';
-    records.forEach(r => {
-      const f = r.fields;
+    items.forEach(f => {
       const card = document.createElement('div');
       card.className = 'why-card';
       const h4 = document.createElement('h4');
-      h4.textContent = f.Titulo || '';
+      h4.textContent = f.titulo || '';
       const p = document.createElement('p');
-      p.textContent = f.Texto || '';
+      p.textContent = f.texto || '';
       card.appendChild(h4);
       card.appendChild(p);
       grid.appendChild(card);
     });
   }
 
-  function renderPaquetes(records){
+  function renderPaquetes(items){
+    if(!items.length) return;
     const grid = document.getElementById('paquetesGrid');
     grid.innerHTML = '';
-    records.forEach(r => {
-      const f = r.fields;
+    items.forEach(f => {
       const card = document.createElement('div');
-      card.className = 'pkg-card' + (f.Premium ? ' premium' : '');
+      card.className = 'pkg-card' + (f.premium ? ' premium' : '');
 
-      if(f.Tag){
+      if(f.tag){
         const tag = document.createElement('span');
         tag.className = 'tag';
-        tag.textContent = f.Tag;
+        tag.textContent = f.tag;
         card.appendChild(tag);
       }
       const h4 = document.createElement('h4');
-      h4.textContent = f.Nombre || '';
+      h4.textContent = f.nombre || '';
       card.appendChild(h4);
 
       const price = document.createElement('div');
       price.className = 'price';
-      price.textContent = f.Precio || '';
+      price.textContent = f.precio || '';
       card.appendChild(price);
 
       const period = document.createElement('div');
       period.className = 'period';
-      period.textContent = f.Periodo || '';
+      period.textContent = f.periodo || '';
       card.appendChild(period);
 
       const desc = document.createElement('p');
       desc.className = 'desc';
-      desc.textContent = f.Descripcion || '';
+      desc.textContent = f.descripcion || '';
       card.appendChild(desc);
 
-      if(f.Save){
+      if(f.save){
         const save = document.createElement('span');
         save.className = 'save';
-        save.textContent = f.Save;
+        save.textContent = f.save;
         card.appendChild(save);
       }
 
       const fit = document.createElement('div');
       fit.className = 'fit';
-      fit.textContent = f.Fit || '';
+      fit.textContent = f.fit || '';
       card.appendChild(fit);
 
       grid.appendChild(card);
     });
   }
 
-  function renderContacto(f){
-    setText('contactName', f.Nombre);
-    setText('contactCargo', f.Cargo);
-    if(f.Telefono){
-      document.getElementById('phoneText').textContent = f.Telefono;
-      const digits = String(f.Telefono).replace(/[^0-9]/g, '');
-      if(digits){
-        document.getElementById('waBtn').href = 'https://wa.me/' + digits;
-        document.getElementById('callBtn').href = 'tel:+' + digits;
-      }
-    }
-    if(f.Email){
-      document.getElementById('emailText').textContent = f.Email;
-      document.getElementById('mailBtn').href = 'mailto:' + f.Email;
-    }
-  }
-
-  async function loadFromAirtable(){
-    if(!AIRTABLE_TOKEN || AIRTABLE_TOKEN.indexOf('PEGA_AQUI') === 0){
-      console.info('Punto de Partida: token de Airtable no configurado — se muestra el contenido de respaldo.');
-      return;
-    }
+  async function loadFromFirestore(){
     try{
-      const [programa, metricas, porque, paquetes, contacto] = await Promise.all([
-        airtableFetch('Programa'),
-        airtableFetch('Metricas'),
-        airtableFetch('PorQue', '?sort%5B0%5D%5Bfield%5D=Orden&sort%5B0%5D%5Bdirection%5D=asc'),
-        airtableFetch('Paquetes', '?sort%5B0%5D%5Bfield%5D=Orden&sort%5B0%5D%5Bdirection%5D=asc'),
-        airtableFetch('Contacto'),
+      const [programaSnap, metricasSnap, contactoSnap, porqueSnap, paquetesSnap] = await Promise.all([
+        getDoc(doc(db, 'content', 'programa')),
+        getDoc(doc(db, 'content', 'metricas')),
+        getDoc(doc(db, 'content', 'contacto')),
+        getDocs(query(collection(db, 'porque'), orderBy('orden'))),
+        getDocs(query(collection(db, 'paquetes'), orderBy('orden'))),
       ]);
-      if(programa.records && programa.records[0]) renderPrograma(programa.records[0].fields);
-      if(metricas.records && metricas.records[0]) renderMetricas(metricas.records[0].fields);
-      if(porque.records && porque.records.length) renderPorque(porque.records);
-      if(paquetes.records && paquetes.records.length) renderPaquetes(paquetes.records);
-      if(contacto.records && contacto.records[0]) renderContacto(contacto.records[0].fields);
+      if(programaSnap.exists()) renderPrograma(programaSnap.data());
+      if(metricasSnap.exists()) renderMetricas(metricasSnap.data());
+      if(contactoSnap.exists()) renderContacto(contactoSnap.data());
+      renderPorque(porqueSnap.docs.map(d => d.data()));
+      renderPaquetes(paquetesSnap.docs.map(d => d.data()));
     }catch(e){
-      console.warn('Punto de Partida: no se pudo cargar el contenido en vivo de Airtable, se muestra el contenido de respaldo.', e);
+      console.warn('Punto de Partida: no se pudo cargar el contenido en vivo de Firestore, se muestra el contenido de respaldo.', e);
     }
   }
 
-  loadFromAirtable();
-})();
+  loadFromFirestore();
 </script>
 
 </body>

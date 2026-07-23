@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Punto de Partida</title>
+<style>
+  :root{
+    --navy:#1F3864;
+    --navy-light:#2E5395;
+    --red:#C00000;
+    --gray:#595959;
+    --light:#DCE6F1;
+    --gold:#D4A017;
+    --border:#D9D9D9;
+    --green:#2e7d32;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;font-family:Arial, Helvetica, sans-serif;color:#222;
+    background:#f4f6f9;line-height:1.5;
+  }
+  header{
+    background:linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+    color:#fff;padding:22px 24px;
+  }
+  header .inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+  header h1{margin:0;font-size:1.4rem;}
+  header a.view-site{color:#dfe7f5;font-size:0.85rem;text-decoration:underline;}
+  #logoutBtn{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.4);color:#fff;padding:7px 14px;border-radius:20px;cursor:pointer;font-size:0.82rem;}
+  #logoutBtn:hover{background:rgba(255,255,255,0.28);}
+
+  main{max-width:1200px;margin:0 auto;padding:24px;}
+
+  /* Login */
+  #loginScreen{max-width:380px;margin:80px auto;background:#fff;border:1px solid var(--border);border-radius:10px;padding:32px;}
+  #loginScreen h2{margin-top:0;color:var(--navy);font-size:1.3rem;}
+  #loginScreen label{display:block;font-size:0.85rem;font-weight:bold;color:var(--gray);margin:14px 0 4px;}
+  #loginScreen input{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:6px;font-size:0.95rem;font-family:inherit;}
+  #loginError{color:var(--red);font-size:0.85rem;margin-top:12px;display:none;}
+  .google-btn{
+    width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
+    background:#fff;color:#3c4043;border:1px solid var(--border);border-radius:6px;
+    padding:10px 16px;font-size:0.9rem;font-weight:bold;cursor:pointer;font-family:inherit;
+  }
+  .google-btn:hover{background:#f7f8f8;}
+  .login-divider{display:flex;align-items:center;gap:10px;margin:18px 0;color:var(--gray);font-size:0.78rem;}
+  .login-divider::before, .login-divider::after{content:"";flex:1;height:1px;background:var(--border);}
+
+  .btn{border:none;border-radius:6px;padding:10px 18px;font-size:0.88rem;font-weight:bold;cursor:pointer;font-family:inherit;}
+  .btn.primary{background:var(--navy);color:#fff;}
+  .btn.primary:hover{background:var(--navy-light);}
+  .btn.accent{background:var(--red);color:#fff;}
+  .btn.accent:hover{background:#a30000;}
+  .btn.ghost{background:#fff;color:var(--navy);border:1px solid var(--navy);}
+  .btn.ghost:hover{background:var(--light);}
+  .btn.small{padding:5px 10px;font-size:0.75rem;}
+
+  nav.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px;}
+  nav.tabs button{
+    background:#fff;border:1px solid var(--border);color:var(--navy);
+    padding:10px 16px;border-radius:20px;font-size:0.85rem;font-weight:bold;
+    cursor:pointer;font-family:inherit;
+  }
+  nav.tabs button.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+
+  .panel{background:#fff;border:1px solid var(--border);border-radius:10px;padding:24px 28px;display:none;}
+  .panel.active{display:block;}
+  .panel h2{margin-top:0;color:var(--navy);font-size:1.25rem;border-bottom:3px solid var(--red);padding-bottom:8px;}
+
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:0.8rem;font-weight:bold;color:var(--gray);margin-bottom:4px;}
+  .field input, .field textarea{
+    width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:6px;
+    font-size:0.9rem;font-family:inherit;
+  }
+  .field textarea{min-height:70px;resize:vertical;}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .field-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+  @media(max-width:640px){.field-row,.field-row3{grid-template-columns:1fr;}}
+
+  .item-card{border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:14px;position:relative;background:#fafcff;}
+  .item-card .del-item{position:absolute;top:10px;right:10px;background:none;border:none;color:var(--red);cursor:pointer;font-size:1rem;}
+  .item-card .del-item:hover{color:#a30000;}
+  .checkbox-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+  .checkbox-row input{width:auto;}
+
+  .save-bar{display:flex;align-items:center;gap:12px;margin-top:18px;flex-wrap:wrap;}
+  .status-msg{font-size:0.85rem;color:var(--green);}
+  .status-msg.error{color:var(--red);}
+
+  .toolbar-tab{display:flex;justify-content:flex-end;margin-bottom:12px;}
+
+  /* Prospectos */
+  .prospectos-toolbar{
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+    margin-bottom:14px;
+  }
+  .prospectos-toolbar input[type="text"]{
+    flex:1;min-width:200px;padding:9px 12px;border:1px solid var(--border);
+    border-radius:6px;font-size:0.9rem;font-family:inherit;
+  }
+  .count{font-size:0.8rem;color:var(--gray);white-space:nowrap;}
+  .sync-status{font-size:0.78rem;color:var(--green);white-space:nowrap;}
+  .sync-status.error{color:var(--red);}
+  .sync-status.pending{color:var(--gray);}
+  .table-wrap{border:1px solid var(--border);border-radius:8px;overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;font-size:0.88rem;min-width:900px;}
+  thead th{
+    background:var(--navy);color:#fff;text-align:left;
+    padding:10px 12px;font-size:0.8rem;position:relative;white-space:nowrap;
+  }
+  thead th[contenteditable]{cursor:text;}
+  thead th .col-actions{display:inline-block;margin-left:6px;opacity:0.6;cursor:pointer;font-size:0.75rem;}
+  thead th .col-actions:hover{opacity:1;color:#ffb3b3;}
+  th.actions-col, td.actions-col{width:46px;text-align:center;white-space:nowrap;}
+  tbody td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:top;min-width:120px;}
+  tbody td[contenteditable]:hover{background:#fafcff;}
+  tbody td[contenteditable]:focus{outline:2px solid var(--navy-light);outline-offset:-2px;background:#fff;}
+  tbody tr:nth-child(even) td{background:#f8f9fb;}
+  tbody tr.hidden{display:none;}
+  .del-row-btn, .del-col-btn{background:none;border:none;cursor:pointer;color:#c00;font-size:0.95rem;}
+  .del-row-btn:hover{color:#ff4d4d;}
+  .note{
+    font-size:0.82rem;color:var(--gray);margin-top:14px;
+    background:#fafcff;border-left:3px solid var(--red);padding:10px 14px;border-radius:0 4px 4px 0;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="inner">
+    <h1>Admin · Punto de Partida</h1>
+    <div style="display:flex;align-items:center;gap:16px;">
+      <a class="view-site" href="index.html" target="_blank" rel="noopener">Ver sitio ↗</a>
+      <button id="logoutBtn" style="display:none;">Cerrar sesión</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div id="loginScreen">
+    <h2>Iniciar sesión</h2>
+    <button class="google-btn" id="googleLoginBtn">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84c-.21 1.13-.85 2.09-1.8 2.73v2.27h2.92c1.7-1.57 2.68-3.88 2.68-6.64z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.17l-2.92-2.27c-.81.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.71H.96v2.34C2.44 15.98 5.48 18 9 18z"/><path fill="#FBBC05" d="M3.97 10.71c-.18-.54-.28-1.11-.28-1.71s.1-1.17.28-1.71V4.95H.96C.35 6.17 0 7.55 0 9s.35 2.83.96 4.05l3.01-2.34z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.51.45 3.44 1.35l2.59-2.59C13.46.89 11.43 0 9 0 5.48 0 2.44 2.02.96 4.95l3.01 2.34C4.68 5.16 6.66 3.58 9 3.58z"/></svg>
+      Ingresar con Google
+    </button>
+    <div class="login-divider">o con email</div>
+    <label for="loginEmail">Email</label>
+    <input type="email" id="loginEmail" autocomplete="username">
+    <label for="loginPass">Contraseña</label>
+    <input type="password" id="loginPass" autocomplete="current-password">
+    <div style="margin-top:18px;">
+      <button class="btn primary" id="loginBtn" style="width:100%;">Entrar</button>
+    </div>
+    <p id="loginError">Email o contraseña incorrectos.</p>
+  </div>
+
+  <div id="adminApp" style="display:none;">
+
+    <nav class="tabs">
+      <button data-tab="programa" class="active">El programa</button>
+      <button data-tab="metricas">Métricas</button>
+      <button data-tab="porque">Por qué sumarse</button>
+      <button data-tab="paquetes">Paquetes</button>
+      <button data-tab="contacto">Contacto</button>
+      <button data-tab="prospectos">Prospectos</button>
+    </nav>
+
+    <!-- PROGRAMA -->
+    <section class="panel active" id="panel-programa">
+      <h2>Sobre el programa</h2>
+      <div class="field"><label>Descripción</label><textarea id="p_descripcion"></textarea></div>
+      <div class="field-row3">
+        <div class="field"><label>Canal</label><input id="p_canal"></div>
+        <div class="field"><label>Día y horario</label><input id="p_diaHorario"></div>
+        <div class="field"><label>Conducción</label><input id="p_conduccion"></div>
+      </div>
+      <div class="field-row3">
+        <div class="field"><label>Género</label><input id="p_genero"></div>
+        <div class="field"><label>Antigüedad</label><input id="p_antiguedad"></div>
+        <div class="field"><label>Sitio web</label><input id="p_web"></div>
+      </div>
+      <div class="field"><label>Bio de Pedro García</label><textarea id="p_pedroBio"></textarea></div>
+      <div class="save-bar">
+        <button class="btn primary" data-save="programa">Guardar cambios</button>
+        <button class="btn ghost" data-seed="programa">Cargar contenido actual del sitio</button>
+        <span class="status-msg" id="status-programa"></span>
+      </div>
+    </section>
+
+    <!-- METRICAS -->
+    <section class="panel" id="panel-metricas">
+      <h2>Métricas</h2>
+      <div class="field-row">
+        <div class="field"><label>Período (ej: Enero–Junio 2026)</label><input id="m_periodo"></div>
+        <div class="field"><label>Mejor mes (nota)</label><input id="m_mejorMesNota"></div>
+      </div>
+      <div class="field-row3">
+        <div class="field"><label>Visualizaciones totales</label><input id="m_visualizaciones"></div>
+        <div class="field"><label>Usuarios únicos / alcance</label><input id="m_usuariosUnicos"></div>
+        <div class="field"><label>Interacciones totales</label><input id="m_interacciones"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Nuevos seguidores</label><input id="m_nuevosSeguidores"></div>
+        <div class="field"><label>Visitas web</label><input id="m_visitasWeb"></div>
+      </div>
+      <h3 style="color:var(--navy-light);">Audiencia</h3>
+      <div class="field-row3">
+        <div class="field"><label>% Argentina</label><input id="m_pctArgentina"></div>
+        <div class="field"><label>% Hombres</label><input id="m_pctHombres"></div>
+        <div class="field"><label>% Mujeres</label><input id="m_pctMujeres"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>% 45 años o más</label><input id="m_pct45Mas"></div>
+        <div class="field"><label>Nota de audiencia</label><input id="m_notaAudiencia"></div>
+      </div>
+      <h3 style="color:var(--navy-light);">Por plataforma</h3>
+      <div class="field-row">
+        <div class="field"><label>Facebook — dato</label><input id="m_facebookDato"></div>
+        <div class="field"><label>Facebook — nota</label><input id="m_facebookNota"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Instagram — dato</label><input id="m_instagramDato"></div>
+        <div class="field"><label>Instagram — nota</label><input id="m_instagramNota"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>YouTube — dato</label><input id="m_youtubeDato"></div>
+        <div class="field"><label>YouTube — nota</label><input id="m_youtubeNota"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>TikTok — dato</label><input id="m_tiktokDato"></div>
+        <div class="field"><label>TikTok — nota</label><input id="m_tiktokNota"></div>
+      </div>
+      <div class="save-bar">
+        <button class="btn primary" data-save="metricas">Guardar cambios</button>
+        <button class="btn ghost" data-seed="metricas">Cargar contenido actual del sitio</button>
+        <span class="status-msg" id="status-metricas"></span>
+      </div>
+    </section>
+
+    <!-- POR QUE -->
+    <section class="panel" id="panel-porque">
+      <h2>Por qué sumar tu marca</h2>
+      <div class="toolbar-tab"><button class="btn ghost small" data-seed="porque">Cargar contenido actual del sitio</button></div>
+      <div id="porqueList"></div>
+      <button class="btn ghost" id="addPorqueBtn">+ Agregar tarjeta</button>
+      <div class="save-bar">
+        <button class="btn primary" data-save="porque">Guardar cambios</button>
+        <span class="status-msg" id="status-porque"></span>
+      </div>
+    </section>
+
+    <!-- PAQUETES -->
+    <section class="panel" id="panel-paquetes">
+      <h2>Paquetes de auspicio</h2>
+      <div class="toolbar-tab"><button class="btn ghost small" data-seed="paquetes">Cargar contenido actual del sitio</button></div>
+      <div id="paquetesList"></div>
+      <button class="btn ghost" id="addPaqueteBtn">+ Agregar paquete</button>
+      <div class="save-bar">
+        <button class="btn primary" data-save="paquetes">Guardar cambios</button>
+        <span class="status-msg" id="status-paquetes"></span>
+      </div>
+    </section>
+
+    <!-- CONTACTO -->
+    <section class="panel" id="panel-contacto">
+      <h2>Contacto</h2>
+      <div class="field-row">
+        <div class="field"><label>Nombre</label><input id="c_nombre"></div>
+        <div class="field"><label>Cargo</label><input id="c_cargo"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Teléfono (con código de país, ej: +5493815995785)</label><input id="c_telefono"></div>
+        <div class="field"><label>Email</label><input id="c_email"></div>
+      </div>
+      <div class="save-bar">
+        <button class="btn primary" data-save="contacto">Guardar cambios</button>
+        <button class="btn ghost" data-seed="contacto">Cargar contenido actual del sitio</button>
+        <span class="status-msg" id="status-contacto"></span>
+      </div>
+    </section>
+
+    <!-- PROSPECTOS -->
+    <section class="panel" id="panel-prospectos">
+      <h2>Prospectos comerciales</h2>
+      <div class="prospectos-toolbar">
+        <input type="text" id="searchBox" placeholder="Buscar en la lista (empresa, rubro, contacto...)">
+        <button class="btn primary" id="addColBtn">+ Columna</button>
+        <span class="count" id="rowCount"></span>
+        <span class="sync-status" id="syncStatus"></span>
+      </div>
+      <div class="table-wrap">
+        <table id="prospectsTable">
+          <thead><tr id="headerRow"></tr></thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn ghost" id="addRowBtn">+ Agregar fila</button>
+        <button class="btn ghost" id="seedProspectosBtn" style="display:none;">Cargar lista inicial de prospectos</button>
+      </div>
+      <div class="note">
+        Los cambios en la planilla (celdas, filas, columnas) se guardan automáticamente en Firebase apenas los hacés.
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut,
+    GoogleAuthProvider, signInWithPopup
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import {
+    getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, deleteField,
+    collection, getDocs, query, orderBy, writeBatch
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDFJ7G9lIygFLuzuaCct_dxos9JM7MhYpQ",
+    authDomain: "puntodepartidatv-6a64b.firebaseapp.com",
+    projectId: "puntodepartidatv-6a64b",
+    storageBucket: "puntodepartidatv-6a64b.firebasestorage.app",
+    messagingSenderId: "1006640955584",
+    appId: "1:1006640955584:web:4421116b57e4dc56fead25",
+    measurementId: "G-MNJ19DQH82"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // ============================================================
+  // Login (Google + email/contraseña) — compartido por toda la app
+  // ============================================================
+  const loginScreen = document.getElementById('loginScreen');
+  const adminApp = document.getElementById('adminApp');
+  const logoutBtn = document.getElementById('logoutBtn');
+
+  document.getElementById('loginBtn').addEventListener('click', async () => {
+    const email = document.getElementById('loginEmail').value.trim();
+    const pass = document.getElementById('loginPass').value;
+    const errEl = document.getElementById('loginError');
+    errEl.style.display = 'none';
+    try{
+      await signInWithEmailAndPassword(auth, email, pass);
+    }catch(e){
+      errEl.textContent = 'No se pudo iniciar sesión: ' + e.code;
+      errEl.style.display = 'block';
+    }
+  });
+
+  document.getElementById('googleLoginBtn').addEventListener('click', async () => {
+    const errEl = document.getElementById('loginError');
+    errEl.style.display = 'none';
+    try{
+      await signInWithPopup(auth, new GoogleAuthProvider());
+    }catch(e){
+      errEl.textContent = 'No se pudo iniciar sesión con Google: ' + e.code;
+      errEl.style.display = 'block';
+    }
+  });
+
+  logoutBtn.addEventListener('click', () => signOut(auth));
+
+  onAuthStateChanged(auth, (user) => {
+    if(user){
+      loginScreen.style.display = 'none';
+      adminApp.style.display = 'block';
+      logoutBtn.style.display = 'inline-block';
+      loadAllData();
+      initProspectos();
+    }else{
+      loginScreen.style.display = 'block';
+      adminApp.style.display = 'none';
+      logoutBtn.style.display = 'none';
+    }
+  });
+
+  // ============================================================
+  // Tabs
+  // ============================================================
+  document.querySelectorAll('nav.tabs button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  function showStatus(key, msg, isError){
+    const el = document.getElementById('status-' + key);
+    if(!el) return;
+    el.textContent = msg;
+    el.className = 'status-msg' + (isError ? ' error' : '');
+    setTimeout(() => { el.textContent = ''; }, 4000);
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  function escapeAttr(s){
+    return escapeHtml(s).replace(/"/g,'&quot;');
+  }
+
+  // ============================================================
+  // Contenido de respaldo (para el botón "Cargar contenido actual del sitio")
+  // ============================================================
+  const seedData = {
+    programa: {
+      descripcion: "Punto de Partida es un programa periodístico político, líder en su género, que se emite desde hace 32 años en Tucumán. Se caracteriza por el pluralismo, el ejercicio ético del periodismo y el estímulo del razonamiento crítico sobre la realidad política, económica y social de la provincia y el país — un espacio que marca agenda cada domingo.",
+      canal: "Canal 10 de Tucumán",
+      diaHorario: "Domingos, 19:00 hs",
+      conduccion: "Pedro García",
+      genero: "Periodístico — político / económico / social",
+      antiguedad: "32 años en el aire",
+      web: "puntodepartidatv.com",
+      pedroBio: "Periodista, productor y conductor. Fue durante 30 años Director del Departamento Informativo de CCC (seis veces premiado como mejor informativo del interior del país por ATVC), hasta 2024. Diplomado en «Economía para Periodistas». Profesor Adjunto a cargo de la Cátedra de Periodismo Televisivo en la Universidad del Norte Santo Tomás de Aquino (UNSTA). Un referente del periodismo tucumano con más de 40 años de trayectoria en el medio."
+    },
+    metricas: {
+      periodo: "Enero–Junio 2026",
+      visualizaciones: "3,2M",
+      usuariosUnicos: "2,1M",
+      interacciones: "153K",
+      nuevosSeguidores: "8K",
+      visitasWeb: "15K",
+      mejorMesNota: "Junio fue el mejor mes: 898.882 visualizaciones multiplataforma",
+      pctArgentina: "84,6%",
+      pctHombres: "64,3%",
+      pctMujeres: "35,7%",
+      pct45Mas: "73,7%",
+      notaAudiencia: "Casi 3 de cada 4 personas que consumen Punto de Partida tienen 45 años o más: coincide con el perfil de tomador de decisión que buscan las marcas auspiciantes.",
+      facebookDato: "1,97M visualizaciones · 5.174 nuevos seguidores",
+      facebookNota: "Awareness masivo: mayor volumen de vistas y alcance para campañas de visibilidad.",
+      instagramDato: "804K visualizaciones · 2.076 nuevos seguidores",
+      instagramNota: "Engagement y viralización: comunidad activa, reels y picos de interacción.",
+      youtubeDato: "158K vistas · 1.850 horas de reproducción",
+      youtubeNota: "Profundidad y permanencia: contenido indexable para branded content y entrevistas.",
+      tiktokDato: "304K visualizaciones · 955 nuevos seguidores netos",
+      tiktokNota: "Crecimiento y distribución orgánica en formato de video corto."
+    },
+    contacto: {
+      nombre: "Eugenia García Sacco",
+      cargo: "Área Comercial · Punto de Partida",
+      telefono: "+5493815995785",
+      email: "puntodepartidacontacto@gmail.com"
+    },
+    porque: [
+      { titulo: "Liderazgo consolidado", texto: "32 años ininterrumpidos como programa líder del género periodístico-político en Tucumán." },
+      { titulo: "Audiencia calificada", texto: "Un público formado por tomadores de decisión: empresarios, dirigentes políticos, profesionales y líderes de opinión de la provincia." },
+      { titulo: "Presencia multiplataforma", texto: "TV abierta en horario prime, sitio web propio con cobertura diaria y redes sociales activas (Instagram, Facebook, X, YouTube)." },
+      { titulo: "Credibilidad y prestigio", texto: "Conducido por Pedro García, una voz de referencia con más de tres décadas construyendo confianza con la audiencia tucumana." }
+    ],
+    paquetes: [
+      { nombre: "Pase publicitario", precio: "$60.000", periodo: "por programa", descripcion: "Mención institucional en vivo durante la emisión dominical.", fit: "Ideal para campañas puntuales o para probar la pauta.", tag: "", save: "", premium: false },
+      { nombre: "Paquete mensual", precio: "$200.000", periodo: "por mes · 4 menciones", descripcion: "Una mención en vivo en cada una de las 4 emisiones del mes.", fit: "Ideal para presencia sostenida durante todo el mes.", tag: "El más elegido", save: "Ahorrás $40.000 vs. pases sueltos", premium: false },
+      { nombre: "Presencia digital", precio: "$120.000", periodo: "por programa o por tema", descripcion: "Tu marca en la web y redes de Punto de Partida (Instagram, Facebook y X), asociada a la emisión o a un tema de actualidad puntual.", fit: "Ideal para marcas que buscan conversación y viralización.", tag: "", save: "", premium: false },
+      { nombre: "Auspicio de columna", precio: "$500.000", periodo: "por mes", descripcion: "Sponsoreás en exclusiva una columna del programa, con temática acorde al rubro de tu marca. Presencia en TV, web y redes.", fit: "Ideal para posicionar tu marca como referente en un tema.", tag: "", save: "", premium: false },
+      { nombre: "Sponsor oficial del programa", precio: "$1.200.000", periodo: "por mes", descripcion: "Tu logo presente en toda la editorial de Punto de Partida: programa en vivo, reels, redes y web. Máxima exposición y asociación con el programa líder del género en Tucumán.", fit: "Ideal para marcas que buscan liderazgo y máxima visibilidad.", tag: "Premium", save: "", premium: true }
+    ]
+  };
+
+  // ============================================================
+  // Programa / Métricas / Contacto (docs simples)
+  // ============================================================
+  const simpleFieldMap = {
+    programa: ['descripcion','canal','diaHorario','conduccion','genero','antiguedad','web','pedroBio'],
+    metricas: ['periodo','visualizaciones','usuariosUnicos','interacciones','nuevosSeguidores','visitasWeb','mejorMesNota','pctArgentina','pctHombres','pctMujeres','pct45Mas','notaAudiencia','facebookDato','facebookNota','instagramDato','instagramNota','youtubeDato','youtubeNota','tiktokDato','tiktokNota'],
+    contacto: ['nombre','cargo','telefono','email']
+  };
+  const prefixMap = { programa: 'p_', metricas: 'm_', contacto: 'c_' };
+
+  function fillSimpleForm(key, data){
+    if(!data) return;
+    simpleFieldMap[key].forEach(f => {
+      const el = document.getElementById(prefixMap[key] + f);
+      if(el && data[f] !== undefined) el.value = data[f];
+    });
+  }
+
+  async function saveSimple(key){
+    const data = {};
+    simpleFieldMap[key].forEach(f => {
+      const el = document.getElementById(prefixMap[key] + f);
+      data[f] = el ? el.value : '';
+    });
+    try{
+      await setDoc(doc(db, 'content', key), data, { merge: true });
+      showStatus(key, '✓ Guardado');
+    }catch(e){
+      showStatus(key, 'Error al guardar: ' + e.message, true);
+    }
+  }
+
+  // ============================================================
+  // Por qué (lista)
+  // ============================================================
+  const porqueList = document.getElementById('porqueList');
+
+  function addPorqueCard(data){
+    const card = document.createElement('div');
+    card.className = 'item-card';
+    card.innerHTML = `
+      <button class="del-item" title="Eliminar">🗑</button>
+      <div class="field"><label>Título</label><input class="porque-titulo" value="${escapeAttr(data?.titulo || '')}"></div>
+      <div class="field"><label>Texto</label><textarea class="porque-texto">${escapeHtml(data?.texto || '')}</textarea></div>
+    `;
+    card.querySelector('.del-item').addEventListener('click', () => card.remove());
+    porqueList.appendChild(card);
+  }
+
+  document.getElementById('addPorqueBtn').addEventListener('click', () => addPorqueCard());
+
+  async function savePorque(){
+    try{
+      const existing = await getDocs(collection(db, 'porque'));
+      const batch = writeBatch(db);
+      existing.docs.forEach(d => batch.delete(d.ref));
+      const cards = porqueList.querySelectorAll('.item-card');
+      cards.forEach((card, i) => {
+        const ref = doc(collection(db, 'porque'));
+        batch.set(ref, {
+          orden: i,
+          titulo: card.querySelector('.porque-titulo').value,
+          texto: card.querySelector('.porque-texto').value
+        });
+      });
+      await batch.commit();
+      showStatus('porque', '✓ Guardado');
+    }catch(e){
+      showStatus('porque', 'Error al guardar: ' + e.message, true);
+    }
+  }
+
+  // ============================================================
+  // Paquetes (lista)
+  // ============================================================
+  const paquetesList = document.getElementById('paquetesList');
+
+  function addPaqueteCard(data){
+    const card = document.createElement('div');
+    card.className = 'item-card';
+    card.innerHTML = `
+      <button class="del-item" title="Eliminar">🗑</button>
+      <div class="field-row3">
+        <div class="field"><label>Nombre</label><input class="pkg-nombre" value="${escapeAttr(data?.nombre || '')}"></div>
+        <div class="field"><label>Precio</label><input class="pkg-precio" value="${escapeAttr(data?.precio || '')}"></div>
+        <div class="field"><label>Período (ej: por mes)</label><input class="pkg-periodo" value="${escapeAttr(data?.periodo || '')}"></div>
+      </div>
+      <div class="field"><label>Descripción</label><textarea class="pkg-descripcion">${escapeHtml(data?.descripcion || '')}</textarea></div>
+      <div class="field"><label>Frase "ideal para..." (fit)</label><input class="pkg-fit" value="${escapeAttr(data?.fit || '')}"></div>
+      <div class="field-row">
+        <div class="field"><label>Etiqueta (ej: "El más elegido", "Premium")</label><input class="pkg-tag" value="${escapeAttr(data?.tag || '')}"></div>
+        <div class="field"><label>Badge de ahorro (opcional)</label><input class="pkg-save" value="${escapeAttr(data?.save || '')}"></div>
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" class="pkg-premium" ${data?.premium ? 'checked' : ''}>
+        <label style="margin:0;">Destacar con estilo premium (dorado)</label>
+      </div>
+    `;
+    card.querySelector('.del-item').addEventListener('click', () => card.remove());
+    paquetesList.appendChild(card);
+  }
+
+  document.getElementById('addPaqueteBtn').addEventListener('click', () => addPaqueteCard());
+
+  async function savePaquetes(){
+    try{
+      const existing = await getDocs(collection(db, 'paquetes'));
+      const batch = writeBatch(db);
+      existing.docs.forEach(d => batch.delete(d.ref));
+      const cards = paquetesList.querySelectorAll('.item-card');
+      cards.forEach((card, i) => {
+        const ref = doc(collection(db, 'paquetes'));
+        batch.set(ref, {
+          orden: i,
+          nombre: card.querySelector('.pkg-nombre').value,
+          precio: card.querySelector('.pkg-precio').value,
+          periodo: card.querySelector('.pkg-periodo').value,
+          descripcion: card.querySelector('.pkg-descripcion').value,
+          fit: card.querySelector('.pkg-fit').value,
+          tag: card.querySelector('.pkg-tag').value,
+          save: card.querySelector('.pkg-save').value,
+          premium: card.querySelector('.pkg-premium').checked
+        });
+      });
+      await batch.commit();
+      showStatus('paquetes', '✓ Guardado');
+    }catch(e){
+      showStatus('paquetes', 'Error al guardar: ' + e.message, true);
+    }
+  }
+
+  // ============================================================
+  // Cargar contenido existente (programa/métricas/porque/paquetes/contacto)
+  // ============================================================
+  async function loadAllData(){
+    try{
+      const [pSnap, mSnap, cSnap, porqueSnap, paquetesSnap] = await Promise.all([
+        getDoc(doc(db, 'content', 'programa')),
+        getDoc(doc(db, 'content', 'metricas')),
+        getDoc(doc(db, 'content', 'contacto')),
+        getDocs(query(collection(db, 'porque'), orderBy('orden'))),
+        getDocs(query(collection(db, 'paquetes'), orderBy('orden'))),
+      ]);
+      if(pSnap.exists()) fillSimpleForm('programa', pSnap.data());
+      if(mSnap.exists()) fillSimpleForm('metricas', mSnap.data());
+      if(cSnap.exists()) fillSimpleForm('contacto', cSnap.data());
+
+      porqueList.innerHTML = '';
+      porqueSnap.docs.forEach(d => addPorqueCard(d.data()));
+
+      paquetesList.innerHTML = '';
+      paquetesSnap.docs.forEach(d => addPaqueteCard(d.data()));
+    }catch(e){
+      console.warn('No se pudo cargar contenido existente de Firestore', e);
+    }
+  }
+
+  document.querySelectorAll('[data-save]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.save;
+      if(key === 'porque') savePorque();
+      else if(key === 'paquetes') savePaquetes();
+      else saveSimple(key);
+    });
+  });
+
+  document.querySelectorAll('[data-seed]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.seed;
+      if(key === 'porque'){
+        porqueList.innerHTML = '';
+        seedData.porque.forEach(item => addPorqueCard(item));
+      }else if(key === 'paquetes'){
+        paquetesList.innerHTML = '';
+        seedData.paquetes.forEach(item => addPaqueteCard(item));
+      }else{
+        fillSimpleForm(key, seedData[key]);
+      }
+      showStatus(key, 'Contenido cargado — revisá y hacé clic en "Guardar cambios" para subirlo.');
+    });
+  });
+
+  // ============================================================
+  // PROSPECTOS
+  // ============================================================
+  const defaultColumns = [
+    { key: 'rubro', label: 'Rubro' },
+    { key: 'empresa', label: 'Empresa / Marca' },
+    { key: 'contacto', label: 'Contacto' },
+    { key: 'telefono', label: 'Teléfono' },
+    { key: 'email', label: 'Email' },
+    { key: 'estado', label: 'Estado' },
+    { key: 'notas', label: 'Notas' },
+  ];
+
+  const initialProspectosData = [
+    ["Agroindustria (limón/citrus)", "San Miguel", "", "", "", "Por contactar", "Mayor citrícola de Tucumán, líder mundial en exportación de limón"],
+    ["Agroindustria (limón/citrus)", "Citrusvil", "", "", "", "Por contactar", "Principal productora de limones; Grupo Lucci"],
+    ["Agroindustria (azúcar)", "Ingenio Concepción", "", "", "", "Por contactar", "Industria azucarera tucumana"],
+    ["Agroindustria (azúcar)", "Ingenio La Florida", "", "", "", "Por contactar", "Industria azucarera tucumana"],
+    ["Bancos y finanzas", "Banco Macro", "", "", "", "Por contactar", "Origen y fuerte presencia en Tucumán"],
+    ["Bancos y finanzas", "BBVA / Banco del Tucumán", "", "", "", "Por contactar", "Banca regional"],
+    ["Seguros", "Sancor Seguros", "", "", "", "Por contactar", "Aseguradora con oficina en Tucumán"],
+    ["Seguros", "La Caja Seguros", "", "", "", "Por contactar", "Aseguradora con oficina en Tucumán"],
+    ["Salud y bienestar", "OSDE", "", "", "", "Por contactar", "Medicina prepaga, delegación Tucumán"],
+    ["Salud y bienestar", "Swiss Medical", "", "", "", "Por contactar", "Medicina prepaga, delegación Tucumán"],
+    ["Salud y bienestar", "Clínica Mayo", "", "", "", "Por contactar", "Primer sanatorio polivalente del norte argentino acreditado por ITAES"],
+    ["Salud y bienestar", "Sanatorio 9 de Julio", "", "", "", "Por contactar", "Hospital privado polivalente de alta complejidad"],
+    ["Salud y bienestar", "Sanatorio Rivadavia", "", "", "", "Por contactar", "Sanatorio privado, Virgen de la Merced 546"],
+    ["Retail y consumo", "Grupo Libertad (supermercados)", "", "", "", "Por contactar", "Cadena de supermercados de origen tucumano"],
+    ["Retail y consumo", "La Anónima", "", "", "", "Por contactar", "Cadena de supermercados con sucursales en Tucumán"],
+    ["Inmobiliario y construcción", "Guzmán & Guzmán", "", "", "", "Por contactar", "Desarrolladora líder del NOA; oficinas en capital y Yerba Buena"],
+    ["Inmobiliario y construcción", "ISN Inmobiliaria & Desarrollos", "", "", "", "Por contactar", "+25 años en el mercado inmobiliario, financiamiento propio"],
+    ["Inmobiliario y construcción", "Terán Inmobiliaria", "", "", "", "Por contactar", "Activa desde 1986 en San Miguel de Tucumán y la provincia"],
+    ["Inmobiliario y construcción", "CM Desarrollos Inmobiliarios", "", "", "", "Por contactar", "Compraventa, alquileres y desarrollo de proyectos"],
+    ["Inmobiliario y construcción", "Ostengo Inmobiliaria", "", "", "", "Por contactar", "Oficina en Marcos Paz 837, San Miguel de Tucumán"],
+    ["Inmobiliario y construcción", "Arcos Construcción", "", "", "", "Por contactar", "Obras civiles, infraestructura e industria, +50 años en el NOA"],
+    ["Automotor", "Autocero (Hyundai Tucumán)", "", "", "", "Por contactar", "Único concesionario oficial Hyundai en Tucumán, 25 años en el mercado"],
+    ["Educación", "UNSTA", "", "", "", "Por contactar", "Vínculo directo: Pedro García es profesor adjunto allí"],
+    ["Educación", "Universidad San Pablo-T", "", "", "", "Por contactar", "Primera universidad privada laica del NOA"],
+    ["Turismo y hotelería", "Sheraton Tucumán Hotel", "", "", "", "Por contactar", "Hotel 4 estrellas, segmento corporativo/turístico"],
+    ["Turismo y hotelería", "Hotel Metropol", "", "", "", "Por contactar", "Hotel 4 estrellas céntrico, familias y viajeros de negocios"],
+    ["Turismo y hotelería", "Hilton Garden Inn Tucumán", "", "", "", "Por contactar", "Hotel 3.5 estrellas, cadena internacional"],
+    ["Estudios profesionales", "Estudios contables / jurídicos (a definir)", "", "", "", "Por definir", "Relevar estudios locales vinculados a economía/finanzas, afines al perfil del programa"],
+    ["Gastronomía", "Cadenas y restaurantes locales (a definir)", "", "", "", "Por definir", "Relevar marcas gastronómicas de San Miguel de Tucumán"],
+  ];
+
+  let columns = [];
+  const headerRow = document.getElementById('headerRow');
+  const tableBody = document.getElementById('tableBody');
+  const searchBox = document.getElementById('searchBox');
+  const rowCountEl = document.getElementById('rowCount');
+  const syncStatusEl = document.getElementById('syncStatus');
+  const seedProspectosBtn = document.getElementById('seedProspectosBtn');
+
+  function setSync(msg, kind){
+    syncStatusEl.textContent = msg;
+    syncStatusEl.className = 'sync-status' + (kind ? ' ' + kind : '');
+    if(kind !== 'error') setTimeout(() => { if(syncStatusEl.textContent === msg) syncStatusEl.textContent=''; }, 2500);
+  }
+
+  function updateCount(){
+    const total = tableBody.querySelectorAll('tr').length;
+    rowCountEl.textContent = total + " empresas";
+  }
+
+  function renderHeader(){
+    headerRow.innerHTML = '';
+    columns.forEach(col => {
+      const th = document.createElement('th');
+      th.contentEditable = "true";
+      th.dataset.key = col.key;
+      th.textContent = col.label;
+      th.addEventListener('blur', () => {
+        col.label = th.textContent.trim();
+        saveColumns();
+      });
+      const delSpan = document.createElement('span');
+      delSpan.className = 'col-actions del-col-btn';
+      delSpan.title = 'Eliminar columna';
+      delSpan.textContent = '✕';
+      delSpan.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if(columns.length <= 1){ alert('Tiene que quedar al menos una columna.'); return; }
+        if(!confirm('¿Eliminar esta columna en toda la tabla?')) return;
+        removeColumn(col.key);
+      });
+      th.appendChild(delSpan);
+      headerRow.appendChild(th);
+    });
+    const actionsTh = document.createElement('th');
+    actionsTh.className = 'actions-col';
+    actionsTh.textContent = '⚙';
+    headerRow.appendChild(actionsTh);
+  }
+
+  async function saveColumns(){
+    try{
+      await setDoc(doc(db, 'prospectosConfig', 'columns'), { columns });
+    }catch(e){
+      setSync('Error al guardar columnas', 'error');
+    }
+  }
+
+  async function removeColumn(key){
+    columns = columns.filter(c => c.key !== key);
+    renderHeader();
+    Array.from(tableBody.children).forEach(tr => {
+      const cell = tr.querySelector('td[data-key="' + key + '"]');
+      if(cell) cell.remove();
+    });
+    await saveColumns();
+    Array.from(tableBody.children).forEach(async tr => {
+      try{ await updateDoc(doc(db, 'prospectos', tr.dataset.id), { ['cells.' + key]: deleteField() }); }catch(e){}
+    });
+  }
+
+  document.getElementById('addColBtn').addEventListener('click', async () => {
+    const label = prompt('Nombre de la nueva columna:', 'Nueva columna');
+    if(label === null) return;
+    const key = 'col_' + Date.now();
+    columns.push({ key, label: label || 'Nueva columna' });
+    renderHeader();
+    Array.from(tableBody.children).forEach(tr => {
+      tr.insertBefore(buildCell(tr.dataset.id, key, ''), tr.lastElementChild);
+    });
+    await saveColumns();
+  });
+
+  function buildCell(rowId, key, value){
+    const td = document.createElement('td');
+    td.contentEditable = "true";
+    td.dataset.key = key;
+    td.textContent = value || '';
+    td.addEventListener('blur', () => saveCell(rowId, key, td.textContent));
+    return td;
+  }
+
+  function buildRow(id, cells){
+    const tr = document.createElement('tr');
+    tr.dataset.id = id;
+    columns.forEach(col => {
+      tr.appendChild(buildCell(id, col.key, cells ? cells[col.key] : ''));
+    });
+    const actionTd = document.createElement('td');
+    actionTd.className = "actions-col";
+    const delBtn = document.createElement('button');
+    delBtn.className = "del-row-btn";
+    delBtn.title = "Eliminar fila";
+    delBtn.textContent = "🗑";
+    delBtn.addEventListener('click', async () => {
+      if(!confirm('¿Eliminar esta fila?')) return;
+      try{
+        await deleteDoc(doc(db, 'prospectos', id));
+        tr.remove();
+        updateCount();
+        setSync('✓ Fila eliminada');
+      }catch(e){
+        setSync('Error al eliminar', 'error');
+      }
+    });
+    actionTd.appendChild(delBtn);
+    tr.appendChild(actionTd);
+    return tr;
+  }
+
+  let saveTimers = {};
+  function saveCell(rowId, key, value){
+    setSync('Guardando…', 'pending');
+    clearTimeout(saveTimers[rowId + key]);
+    saveTimers[rowId + key] = setTimeout(async () => {
+      try{
+        await updateDoc(doc(db, 'prospectos', rowId), { ['cells.' + key]: value });
+        setSync('✓ Guardado');
+      }catch(e){
+        setSync('Error al guardar', 'error');
+      }
+    }, 400);
+  }
+
+  document.getElementById('addRowBtn').addEventListener('click', async () => {
+    try{
+      const ref = doc(collection(db, 'prospectos'));
+      const emptyCells = {};
+      columns.forEach(c => emptyCells[c.key] = '');
+      await setDoc(ref, { orden: tableBody.children.length, cells: emptyCells });
+      const tr = buildRow(ref.id, emptyCells);
+      tableBody.appendChild(tr);
+      updateCount();
+      const firstCell = tr.querySelector('td');
+      if(firstCell) firstCell.focus();
+      if(typeof tr.scrollIntoView === 'function') tr.scrollIntoView({behavior:'smooth', block:'center'});
+      setSync('✓ Fila agregada');
+    }catch(e){
+      setSync('Error al agregar fila', 'error');
+    }
+  });
+
+  seedProspectosBtn.addEventListener('click', async () => {
+    if(!confirm('Esto va a cargar la lista inicial de ' + initialProspectosData.length + ' prospectos en Firebase. ¿Continuar?')) return;
+    setSync('Cargando datos iniciales…', 'pending');
+    try{
+      if(columns.length === 0){
+        columns = defaultColumns.map(c => ({...c}));
+        await saveColumns();
+        renderHeader();
+      }
+      const batch = writeBatch(db);
+      const refs = [];
+      initialProspectosData.forEach((row, i) => {
+        const ref = doc(collection(db, 'prospectos'));
+        const cells = {};
+        columns.forEach((c, idx) => cells[c.key] = row[idx] || '');
+        batch.set(ref, { orden: i, cells });
+        refs.push({ ref, cells });
+      });
+      await batch.commit();
+      tableBody.innerHTML = '';
+      refs.forEach(r => tableBody.appendChild(buildRow(r.ref.id, r.cells)));
+      updateCount();
+      seedProspectosBtn.style.display = 'none';
+      setSync('✓ Datos iniciales cargados');
+    }catch(e){
+      setSync('Error al cargar datos iniciales', 'error');
+    }
+  });
+
+  searchBox.addEventListener('input', function(){
+    const q = searchBox.value.trim().toLowerCase();
+    Array.from(tableBody.children).forEach(tr => {
+      const text = tr.textContent.toLowerCase();
+      tr.classList.toggle('hidden', q !== '' && !text.includes(q));
+    });
+  });
+
+  async function initProspectos(){
+    setSync('Cargando…', 'pending');
+    try{
+      const colSnap = await getDoc(doc(db, 'prospectosConfig', 'columns'));
+      if(colSnap.exists() && Array.isArray(colSnap.data().columns) && colSnap.data().columns.length){
+        columns = colSnap.data().columns;
+      }else{
+        columns = defaultColumns.map(c => ({...c}));
+      }
+      renderHeader();
+
+      const rowsSnap = await getDocs(query(collection(db, 'prospectos'), orderBy('orden')));
+      tableBody.innerHTML = '';
+      rowsSnap.docs.forEach(d => tableBody.appendChild(buildRow(d.id, d.data().cells || {})));
+      updateCount();
+
+      seedProspectosBtn.style.display = rowsSnap.empty ? 'inline-block' : 'none';
+      setSync('✓ Al día');
+    }catch(e){
+      setSync('Error al cargar desde Firebase', 'error');
+      console.error(e);
+    }
+  }
+</script>
+
+</body>
+</html>

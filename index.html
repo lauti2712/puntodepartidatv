@@ -32,14 +32,26 @@
   header.hero h1{margin:0 0 8px;font-size:2.8rem;letter-spacing:1px;}
   header.hero p.tagline{margin:0 0 20px;font-style:italic;font-size:1.2rem;color:#dfe7f5;}
   header.hero p.pitch{margin:0 0 20px;font-size:1.05rem;max-width:640px;color:#f0f3fa;}
-  header.hero .meta{display:flex;flex-wrap:wrap;gap:10px;}
-  header.hero .meta span{
+  header.hero .meta{display:flex;flex-wrap:wrap;gap:10px;align-items:center;}
+  header.hero .meta span, header.hero .meta a{
     background:rgba(255,255,255,0.14);
     border:1px solid rgba(255,255,255,0.32);
     padding:7px 16px;
     border-radius:20px;
     font-size:0.85rem;
+    color:#fff;
+    text-decoration:none;
   }
+  header.hero .meta a:hover{background:rgba(255,255,255,0.26);}
+  header.hero .social{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;}
+  header.hero .social a{
+    display:inline-flex;align-items:center;gap:6px;
+    background:rgba(255,255,255,0.14);
+    border:1px solid rgba(255,255,255,0.32);
+    padding:7px 16px;border-radius:20px;
+    font-size:0.82rem;color:#fff;text-decoration:none;font-weight:bold;
+  }
+  header.hero .social a:hover{background:rgba(255,255,255,0.26);}
   nav.tabs{
     position:sticky;top:0;z-index:10;
     background:#fff;
@@ -186,7 +198,12 @@
       <span>📺 Canal 10 Tucumán</span>
       <span>🗓️ Domingos 19:00 hs</span>
       <span>🎙️ Conducción: Pedro García</span>
-      <span>🌐 puntodepartidatv.com</span>
+      <a id="webLink" href="https://puntodepartidatv.com" target="_blank" rel="noopener">🌐 puntodepartidatv.com</a>
+    </div>
+    <div class="social" id="socialRow">
+      <a id="socialInstagram" href="https://www.instagram.com/puntodepartidatv" target="_blank" rel="noopener">📷 Instagram</a>
+      <a id="socialInstagramPedro" href="https://www.instagram.com/pedrogarcia.tv/" target="_blank" rel="noopener">📷 Pedro García</a>
+      <a id="socialTiktok" href="https://www.tiktok.com/@puntodepartidatv" target="_blank" rel="noopener">🎵 TikTok</a>
     </div>
   </div>
 </header>
@@ -212,7 +229,7 @@
       <div class="label">Conducción</div><div id="factConduccion">Pedro García</div>
       <div class="label">Género</div><div id="factGenero">Periodístico — político / económico / social</div>
       <div class="label">Antigüedad</div><div id="factAntiguedad">32 años en el aire</div>
-      <div class="label">Sitio web</div><div id="factWeb">puntodepartidatv.com</div>
+      <div class="label">Sitio web</div><div><a id="factWeb" href="https://puntodepartidatv.com" target="_blank" rel="noopener">puntodepartidatv.com</a></div>
     </div>
 
     <h3>Pedro García — Conductor</h3>
@@ -396,6 +413,19 @@
     if(el) el.textContent = value;
   }
 
+  function normalizeUrl(u){
+    if(!u) return '';
+    return /^https?:\/\//i.test(u) ? u : 'https://' + u;
+  }
+
+  function setLink(id, url, label){
+    if(!url) return;
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.href = normalizeUrl(url);
+    if(label !== undefined) el.textContent = label;
+  }
+
   function renderPrograma(f){
     setText('progDescripcion', f.descripcion);
     setText('factCanal', f.canal);
@@ -403,8 +433,15 @@
     setText('factConduccion', f.conduccion);
     setText('factGenero', f.genero);
     setText('factAntiguedad', f.antiguedad);
-    setText('factWeb', f.web);
     setText('pedroBio', f.pedroBio);
+    if(f.web){
+      const display = f.web.replace(/^https?:\/\//i, '').replace(/\/$/, '');
+      setLink('factWeb', f.web, display);
+      setLink('webLink', f.web, '🌐 ' + display);
+    }
+    setLink('socialInstagram', f.instagramUrl);
+    setLink('socialInstagramPedro', f.instagramPedroUrl);
+    setLink('socialTiktok', f.tiktokUrl);
   }
 
   function renderMetricas(f){
